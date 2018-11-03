@@ -84,14 +84,14 @@
                 </Button>-->
             </StackPanel>
             <DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" x:Name="DGV" ItemsSource="{Binding}">
-                <DataGrid.Columns>
+                <!--<DataGrid.Columns>
                     <DataGridTextColumn Header="Genre"
                                     Binding="{Binding Genre.Name}" />
                     <controls:DataGridNumericUpDownColumn Header="Price"
                                                       Binding="{Binding Price}"
                                                       StringFormat="C"
                                                       Minimum="0" />
-                </DataGrid.Columns>
+                </DataGrid.Columns>-->
             </DataGrid>
             <StackPanel Grid.Column="1">
                 <Grid>

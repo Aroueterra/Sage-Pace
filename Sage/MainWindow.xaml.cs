@@ -17,6 +17,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 namespace Sage
 {
@@ -37,7 +38,7 @@ namespace Sage
             typeof(TextBlock),
             new FrameworkPropertyMetadata(
                 new FontFamily("Segoe UI")));
-
+            FillDataGrid();
         }
         //string conString = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
         //string conString = "Data Source=oracle;User Id=nexus;Password=password;";
@@ -68,68 +69,65 @@ namespace Sage
 
         private void Connect_Click(object sender, RoutedEventArgs e)
         {
-            OracleConnection con = new OracleConnection(conString);
-            //OracleCommand cmd = new OracleCommand();
-            //cmd.CommandText = "Select * sage_table";
-            //con.Open();
-            //Console.WriteLine("Connected to Oracle" + con.ServerVersion);
-            //if (CheckConnection() == true)
-            //{
-            //    MessageBox.Show("Connected");
-            //}
-            //OracleDataReader Reader = cmd.ExecuteReader();
-            //int RecordCount = 0;
-            //con.Open();
-            //MessageBox.Show((TableExists(con, "sage_table")).ToString());
-            //con.Close();
-            Conn();
-            //RecordCount = checkPort();
 
+            OLE();
 
-            //try
-            //{
-            //    while (Reader.Read())
-            //    {
-            //        RecordCount = RecordCount + 1;
-            //        MessageBox.Show(Reader.GetString(0).ToString());
-            //    }
-            //    if (RecordCount == 0)
-            //    {
-            //        MessageBox.Show("No data returned");
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Number of records returned: " + RecordCount);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.ToString());
-            //}
-            //finally
-            //{
-            //    RowCount.Text = "Rows: " + RecordCount;
-            //    Reader.Close();
-            //    con.Close();
-            //    con.Dispose();
-            //    Console.WriteLine("Disconnected");
-            //}
         }
-        public bool CheckConnection()
+        public void OLE()
         {
-            using (var conn = new OracleConnection(conString))
+            String sConnectionString = "User ID=SAGE;password=password;Data Source = localhost:1521/xe; Persist Security Info = False";
+            String mySelectQuery = "SELECT FName FROM sage_table";
+
+            OracleConnection myConnection = new OracleConnection(sConnectionString);
+            OracleCommand myCommand = new OracleCommand(mySelectQuery, myConnection);
+
+            myConnection.Open();
+            OracleDataReader myReader = myCommand.ExecuteReader();
+            int RecordCount = 0;
+            try
             {
-                try
+                while (myReader.Read())
                 {
-                    conn.Open();
-                    return true;
+                    RecordCount = RecordCount + 1;
+                    MessageBox.Show(myReader.GetString(0).ToString());
                 }
-                catch
+                if (RecordCount == 0)
                 {
-                    return false;
+                    MessageBox.Show("No data returned");
+                }
+                else
+                {
+                    MessageBox.Show("Number of records returned: " + RecordCount);
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                myReader.Close();
+                myConnection.Close();
+            }
         }
+
+
+
+        private void FillDataGrid()
+        {
+            string ConString = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+            string CmdString = string.Empty;
+            using (OracleConnection con = new OracleConnection(ConString))
+            {
+                CmdString = "SELECT ID, FName as , LName FROM sage_table";
+                OracleCommand cmd = new OracleCommand(CmdString, con);
+                OracleDataAdapter sda = new OracleDataAdapter(cmd);
+                DataTable dt = new DataTable("sage_table");
+                sda.Fill(dt);
+                DGV.ItemsSource = dt.DefaultView;
+            }
+        }
+
         public void Conn()
         {
             using (OracleConnection con = new OracleConnection(conString))
@@ -142,9 +140,10 @@ namespace Sage
                     OracleCommand cmd = new OracleCommand();
                     string sqlquery = ("SELECT * FROM sage_schema.sage_table");
                     cmd.CommandText = sqlquery;
-                    var dataReader = cmd.ExecuteReader();
+                    OracleDataReader reader = cmd.ExecuteReader();
+                    reader.Read();
                     var dataTable = new DataTable();
-                    dataTable.Load(dataReader);
+                    dataTable.Load(reader);
                     DGV.DataContext = dataTable;
                     //OracleDataReader dr = cmd.ExecuteReader();
                     //txtFName.Text = dr.ToString();
@@ -157,13 +156,67 @@ namespace Sage
                 }
                 finally
                 {
-                    con.Close();
-
                     Console.WriteLine("Connection Closed");
                 }
             }
         }
 
+        public void ReadData(string connectionString)
+        {
+            string queryString = "SELECT ID, FName FROM sage_table";
+            using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                OracleCommand command = new OracleCommand(queryString, connection);
+                connection.Open();
+                Console.WriteLine("open");
+                try
+                {
+                    using (OracleDataReader reader = command.ExecuteReader())
+                    {
+                        // Always call Read before accessing data.
+                        while (reader.Read())
+                        {
+                            Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
+                            Console.WriteLine("done");
+                        }
+                    }
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+            }
+        }
+        public class OracleDBManager
+        {
+            private OracleConnection _con;
+            private const string connectionString = "User Id={0};Password={1};Data Source=MyDataSource;";
+            private const string OracleDBUser = "sage";
+            private const string OracleDBPassword = "password";
+
+            public OracleDBManager()
+            {
+                InitializeDBConnection();
+            }
+
+            ~OracleDBManager()
+            {
+                if (_con != null)
+                {
+                    _con.Close();
+                    _con.Dispose();
+                    _con = null;
+                }
+            }
+
+            private void InitializeDBConnection()
+            {
+                _con = new OracleConnection();
+                _con.ConnectionString = string.Format(connectionString, OracleDBUser, OracleDBPassword);
+                _con.Open();
+            }
+        }
         public Boolean TableExists(OracleConnection connection, String tableName)
         {
             return TableExists(connection, tableName, null);
