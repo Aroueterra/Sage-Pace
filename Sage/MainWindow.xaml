@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Title="Sage:Pace"
         ShowIconOnTitleBar="False" 
-        Icon="Resources/app_icon.png"
+        Icon="Resources/sage.ico"
         GlowBrush="{DynamicResource AccentColorBrush}"
         WindowStartupLocation="CenterScreen"
         Height="{Binding SystemParameters.PrimaryScreenHeight}" 
@@ -26,14 +26,14 @@
 
 
         <Grid Grid.Row="0">
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <!--Top Pane C0-->
+            <!--Top Ribbon C0-->
 
 
             <TabControl>
@@ -41,7 +41,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBox Grid.Row="0" Width="150" Controls:TextBoxHelper.Watermark="Username" />
                         <PasswordBox Grid.Row="1" Width="150" Controls:TextBoxHelper.Watermark="Password" PasswordChar="*" />
-                        <Button Grid.Row="0" Width="250" Height="45" Grid.Column="0" x:Name="Select"  VerticalAlignment="Center" Click="Submit_Click" Style="{StaticResource AccentedSquareButtonStyle}">
+                        <Button Grid.Row="0" Width="250" Height="45" Grid.Column="0" x:Name="Select"  VerticalAlignment="Center" Click="Connect_Click" Style="{StaticResource AccentedSquareButtonStyle}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
                                     <!--<iconPacks:PackIconFontAwesome Kind="StarRegular" VerticalAlignment="Center" HorizontalAlignment="Left" />-->
@@ -60,10 +60,10 @@
                 </TabItem>
             </TabControl>
         </Grid>
-        
 
-        
-        
+
+
+
         <!--Mid Pane-->
         <Grid Grid.Row="1" Margin="5">
             <Grid.RowDefinitions>
@@ -73,7 +73,7 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-        
+
             <StackPanel>
                 <!--<Button Grid.Row="0" Grid.Column="0" x:Name="Submit" Height="35" VerticalAlignment="Center" Click="Submit_Click" >
                     <Button.Content>
@@ -83,7 +83,7 @@
                     </Button.Content>
                 </Button>-->
             </StackPanel>
-            <DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" x:Name="DGV" ItemsSource="{Binding}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Genre"
                                     Binding="{Binding Genre.Name}" />
@@ -93,11 +93,48 @@
                                                       Minimum="0" />
                 </DataGrid.Columns>
             </DataGrid>
-
+            <StackPanel Grid.Column="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="17*"/>
+                        <ColumnDefinition Width="169*"/>
+                        <ColumnDefinition Width="185*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch"  Height="35" x:Name="Insert"  VerticalAlignment="Center" Click="Submit_Click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="16" HorizontalAlignment="Left"> Insert</TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch"  Height="35" x:Name="Update"  VerticalAlignment="Center" Click="Submit_Click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="16" HorizontalAlignment="Left"> Update</TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch"  Height="35" x:Name="Delete"  VerticalAlignment="Center" Click="Submit_Click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="16" HorizontalAlignment="Left"> Delete</TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <TextBox Grid.Row="0" Width="150" Controls:TextBoxHelper.Watermark="ID" IsReadOnly="False" x:Name="txtID" Grid.Column="1" Margin="1.5,0,17,0"/>
+                    <TextBox Grid.Row="1" Width="150" Controls:TextBoxHelper.Watermark="First_Name" x:Name="txtFName" Grid.Column="1" Margin="1.5,0,17,0" />
+                    <TextBox Grid.Row="2" Width="150" Controls:TextBoxHelper.Watermark="Last_Name" x:Name="txtLName" Grid.Column="1" Margin="1.5,0,17,0" />
+                </Grid>
+            </StackPanel>
 
 
         </Grid>
-        
+
     </Grid>
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
@@ -113,7 +150,8 @@
                    VerticalAlignment="Center"
                    Text="User View" />
                 </StackPanel>
-            </Button> 
+            </Button>
+            <TextBlock x:Name="RowCount">Rows: </TextBlock>
             <Button>
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="20"
