@@ -19,6 +19,7 @@ using System.Data.OleDb;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 using System.Globalization;
+using System.IO;
 
 namespace Sage
 {
@@ -28,12 +29,17 @@ namespace Sage
     /// 
     public partial class MainWindow : MetroWindow
     {
-        private ViewModeller VM;
+        ListModel Retrieve = new ListModel();
+
         public MainWindow()
         {
             InitializeComponent();
-            VM = new ViewModeller();
-
+            TextBox[] boxes = new TextBox[10]
+            {
+                txtID, txtISBN, txtTitle, txtEdition, txtAuthor, txtGenre,
+                txtPub_Date, txtPublisher, txtQuantity, txtImage
+            };
+            Retrieve.SetBoxes(Retrieve.Lister(boxes));
             TextElement.FontFamilyProperty.OverrideMetadata(
             typeof(TextElement),
             new FrameworkPropertyMetadata(
@@ -42,134 +48,260 @@ namespace Sage
             typeof(TextBlock),
             new FrameworkPropertyMetadata(
                 new FontFamily("Segoe UI")));
-
-            FillDataGrid();
-            Receipt.IsEnabled = false;
-            Export.IsEnabled = false;
-
-        }
-        public
-        string conString = "Data Source = (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = tcp)(HOST = localhost)(PORT = 1521)))(CONNECT_DATA = (SID=xe))); User ID = sage; Password=password";
-        private void Submit_Click(object sender, RoutedEventArgs e)
-        {
-            OleDbConnection Connection = new OleDbConnection(conString);
-            OleDbCommand cmd = new OleDbCommand();
-            cmd.CommandText = "INSERT INTO nexus_table(ID, First_Name) Values(@IDNum, @FNameTxt)";
-            cmd.Parameters.AddWithValue("@IDnum", txtID.Text);
-            cmd.Parameters.AddWithValue("@FNameTxt", txtISBN.Text);
-            Connection.Open();
-            OleDbDataReader Reader = cmd.ExecuteReader();
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-            finally
-            {
-                Reader.Close();
-                Connection.Close();
-            }
+            Retrieve.SetTable("book_table");
+            FillDataGrid(Retrieve.SelectTable());
         }
 
-        private void Connect_Click(object sender, RoutedEventArgs e)
-        {
+        public string conString = "Data Source = (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = tcp)(HOST = localhost)(PORT = 1521)))(CONNECT_DATA = (SID=xe))); User ID = sage; Password=password";
 
-            OLE();
-        }
-
+        #region TAB SETUP
         public void tbInventory_Click(object sender, RoutedEventArgs e)
         {
-            List<TextBox> ListedBoxes = new List<TextBox>()
-            {
-                txtID, txtISBN, txtTitle, txtEdition, txtAuthor, txtGenre,
-                txtPub_Date, txtPublisher, txtQuantity, txtPrice, txtThumb
-            };
-            List<string> Content = new List<string>()
-            {
-                "Book ID", "ISBN ID", "Title", "Edition", "Author", "Genre",
-                "Publication Date", "Publisher", "Quantity", "Price", "Thumbnail"
-            };
-            for(int i=0; i<=10; i++)
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            List<string> Content = Retrieve.Book_Content();
+            for(int i=0; i<=9; i++)
             {
                 ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, Content[i]);
                 ListedBoxes[i].IsEnabled = true;
                 ListedBoxes[i].Visibility = Visibility.Visible;
                 ListedBoxes[i].IsReadOnly = false;
             }
-            Insert.IsEnabled = true;
-            Update.IsEnabled = true;
-            Delete.IsEnabled = true;
-            Receipt.IsEnabled = false;
-            Export.IsEnabled = false;
+            cmbStack.Visibility = Visibility.Visible;
+            lblSelect.Visibility = Visibility.Visible;
+            FillDataGrid("book_table");
         }
         public void tbOrders_Click(object sender, RoutedEventArgs e)
         {
-            List<TextBox> ListedBoxes = new List<TextBox>()
-            {
-                txtID, txtISBN, txtTitle, txtEdition, txtAuthor, txtGenre,
-                txtPub_Date, txtPublisher, txtQuantity, txtPrice, txtThumb
-            };
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+
             for (int i = 0; i <= 5; i++)
             {
                 ListedBoxes[i].IsReadOnly = false;
                 ListedBoxes[i].IsEnabled = true;
                 ListedBoxes[i].Visibility = Visibility.Visible;
             }
-            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Order ID");
-            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Book ID");
-            ListedBoxes[2].SetValue(TextBoxHelper.WatermarkProperty, "Price");
-            ListedBoxes[3].SetValue(TextBoxHelper.WatermarkProperty, "Paid");
-            ListedBoxes[4].SetValue(TextBoxHelper.WatermarkProperty, "Date");
-            for(int i = 5; i<=10; i++)
+            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Book ID");
+            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Student ID");
+            ListedBoxes[2].SetValue(TextBoxHelper.WatermarkProperty, "Borrowed");
+            ListedBoxes[3].SetValue(TextBoxHelper.WatermarkProperty, "Returned");
+            ListedBoxes[4].SetValue(TextBoxHelper.WatermarkProperty, "Balance");
+            for (int i = 5; i<=9; i++)
             {
                 ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
                 ListedBoxes[i].IsReadOnly = true;
                 ListedBoxes[i].IsEnabled = false;
                 ListedBoxes[i].Visibility = Visibility.Hidden;
             }
-            Insert.IsEnabled = false;
-            Update.IsEnabled = false;
-            Delete.IsEnabled = false;
-            Receipt.IsEnabled = true;
-            Export.IsEnabled = false;
+            cmbStack.Visibility = Visibility.Hidden;
+            lblSelect.Visibility = Visibility.Hidden;
+            FillDataGrid("order_table");
         }
         public void tbExport_Click(object sender, RoutedEventArgs e)
         {
-            List<TextBox> ListedBoxes = new List<TextBox>()
-            {
-                txtID, txtISBN, txtTitle, txtEdition, txtAuthor, txtGenre,
-                txtPub_Date, txtPublisher, txtQuantity, txtPrice, txtThumb
-            };
-            for (int i = 0; i <= 10; i++)
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            for (int i = 0; i <= 9; i++)
             {
                 ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
                 ListedBoxes[i].IsReadOnly = true;
                 ListedBoxes[i].IsEnabled = false;
                 ListedBoxes[i].Visibility = Visibility.Collapsed;
             }
-            Insert.IsEnabled = false;
-            Update.IsEnabled = false;
-            Delete.IsEnabled = false;
-            Receipt.IsEnabled = false;
-            Export.IsEnabled = true;
+            txtSearch.Visibility = Visibility.Hidden;
+            cmbStack.Visibility = Visibility.Hidden;
+            lblSelect.Visibility = Visibility.Hidden;
         }
-        public Boolean CheckAvail(string id)
+        #endregion  
+
+        #region UI SETUP
+        public void BookSetup()
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            List<string> Content = Retrieve.Book_Content();
+            for (int i = 0; i <= 9; i++)
+            {
+                ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, Content[i]);
+                ListedBoxes[i].IsEnabled = true;
+                ListedBoxes[i].Visibility = Visibility.Visible;
+                ListedBoxes[i].IsReadOnly = false;
+            }
+        }
+        public void StudentSetup()
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Student ID");
+            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Student Name");
+            ListedBoxes[2].SetValue(TextBoxHelper.WatermarkProperty, "Contact ID");
+            for (int i = 0; i <= 2; i++)
+            {
+                ListedBoxes[i].IsEnabled = true;
+                ListedBoxes[i].Visibility = Visibility.Visible;
+                ListedBoxes[i].IsReadOnly = false;
+            }
+            for (int i = 3; i <= 9; i++)
+            {
+                ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
+                ListedBoxes[i].IsReadOnly = true;
+                ListedBoxes[i].IsEnabled = false;
+                ListedBoxes[i].Visibility = Visibility.Hidden;
+            }
+        }
+        public void AuthorSetup()
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Author ID");
+            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Author Name");
+            for (int i = 0; i <= 1; i++)
+            {
+                ListedBoxes[i].IsEnabled = true;
+                ListedBoxes[i].Visibility = Visibility.Visible;
+                ListedBoxes[i].IsReadOnly = false;
+            }
+            for (int i = 2; i <= 9; i++)
+            {
+                ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
+                ListedBoxes[i].IsReadOnly = true;
+                ListedBoxes[i].IsEnabled = false;
+                ListedBoxes[i].Visibility = Visibility.Hidden;
+            }
+        }
+        public void GenreSetup()
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Genre ID");
+            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Genre Name");
+            for (int i = 0; i <= 1; i++)
+            {
+                ListedBoxes[i].IsEnabled = true;
+                ListedBoxes[i].Visibility = Visibility.Visible;
+                ListedBoxes[i].IsReadOnly = false;
+            }
+            for (int i = 2; i <= 9; i++)
+            {
+                ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
+                ListedBoxes[i].IsReadOnly = true;
+                ListedBoxes[i].IsEnabled = false;
+                ListedBoxes[i].Visibility = Visibility.Hidden;
+            }
+        }
+        public void ContactSetup()
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            ListedBoxes[0].SetValue(TextBoxHelper.WatermarkProperty, "Contact ID");
+            ListedBoxes[1].SetValue(TextBoxHelper.WatermarkProperty, "Phone Number");
+            ListedBoxes[2].SetValue(TextBoxHelper.WatermarkProperty, "Zip Code");
+            ListedBoxes[3].SetValue(TextBoxHelper.WatermarkProperty, "Address");
+            for (int i = 0; i <= 3; i++)
+            {
+                ListedBoxes[i].IsEnabled = true;
+                ListedBoxes[i].Visibility = Visibility.Visible;
+                ListedBoxes[i].IsReadOnly = false;
+            }
+            for (int i = 4; i <= 9; i++)
+            {
+                ListedBoxes[i].SetValue(TextBoxHelper.WatermarkProperty, "");
+                ListedBoxes[i].IsReadOnly = true;
+                ListedBoxes[i].IsEnabled = false;
+                ListedBoxes[i].Visibility = Visibility.Hidden;
+            }
+        }
+        #endregion
+
+        #region ComboBox
+        private bool selected = true;
+        private void ComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            if (selected) HandleSelection();
+            selected = true;
+        }
+        void cmbSearch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox cmb = sender as ComboBox;
+            selected = !cmb.IsDropDownOpen;
+            HandleSelection();
+        }
+        void HandleSelection()
+        {
+            if (cmbTables.SelectedValue.ToString() != null)
+            {
+                string item = cmbTables.SelectedValue.ToString();
+                Retrieve.SetTable(item);
+                switch (Retrieve.SelectTable())
+                {
+                    case "book_table":
+                        BookSetup();
+                        break;
+                    case "author_master":
+                        AuthorSetup();
+                        break;
+                    case "genre_master":
+                        GenreSetup();
+                        break;
+                    case "student_table":
+                        StudentSetup();
+                        break;
+                    case "contact_table":
+                        ContactSetup();
+                        break;
+                }
+            }
+            else
+            {
+            }
+        }
+        #endregion
+        
+        #region CRUD
+        public bool CheckAvail(string id, string table)
         {
             string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
             string command = string.Empty;
+            string column = null;
+            switch (table)
+            {
+                case "book_table":
+                    column = "book_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder(table, "where", column);
+                    break;
+                case "author_master":
+                    column = "author_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder(table, "where", column);
+                    Console.WriteLine(command);
+                    break;
+                case "genre_master":
+                    column = "genre_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder(table, "where", column);          
+                    break;
+                case "student_table":
+                    column = "student_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder(table, "where", column);
+                    break;
+                case "contact_table":
+                    column = "contact_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder(table, "where", column);
+                    break;
+                default:
+                    column = "order_ID";
+                    command = "Select COUNT(*) from " + QueryBuilder("order_table", "where", column);
+                    break;
+            }
+
             int count = 0;
             using (OracleConnection con = new OracleConnection(connection))
             {
                 con.Open();
-                command = "Select COUNT(*) from book_table where Book_ID = :book_ID";
                 OracleCommand cmd = new OracleCommand(command, con);
-                cmd.Parameters.Add(new OracleParameter(":book_ID", txtID.Text));
-                object result = cmd.ExecuteScalar();
-                result = (result == DBNull.Value) ? null : result;
-                count = Convert.ToInt32(result);
+                cmd.Parameters.Add(new OracleParameter(column, txtID.Text));
+                try
+                {
+                    object result = cmd.ExecuteScalar();
+                    result = (result == DBNull.Value) ? null : result;
+                    count = Convert.ToInt32(result);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
             }
 
             if (count >= 1)
@@ -183,22 +315,54 @@ namespace Sage
         }
         public void btnInsert_Click(object sender, RoutedEventArgs e)
         {
-            string command = string.Empty;
+
+            string table = Retrieve.SelectTable();
+            string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+            switch (table) {
+                case "book_table":
+                    Book_INSERT(connection, table);
+                    break;
+                case "author_master":
+                    Author_INSERT(connection, table);
+                    break;
+                case "genre_master":
+                    Genre_INSERT(connection, table);
+                    break;
+                case "student_table":
+                    Student_INSERT(connection, table);
+                    break;
+                case "contact_table":
+                    Contact_INSERT(connection, table);
+                    break;
+            }
+            //MessageBox.Show("Query complete");
+
+        }
+        string QueryBuilder(string table, string query, string column)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(table);
+            sb.Append(" " + query + " ");
+            sb.Append(column + " = :" + column);
+            return sb.ToString();
+        }
+
+        void Book_INSERT(string connection, string table)
+        {
             bool type = false;
-            if (CheckAvail(txtID.Text) == true)
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
             {
-                command = "UPDATE book_table SET book_ID = :BOOK_ID, ISBN = :ISBN, TITLE =:Title, EDITION =:Edition, AUTHOR =:Author, GENRE =:Genre, PUBLICATION_DATE =:Publication_Date, PUBLISHER =:Publisher, QUANTITY =:Quantity, PRICE =:Price, THUMB =:Thumbnail";
+                command = "UPDATE book_table SET book_ID = :BOOK_ID, ISBN = :ISBN, TITLE =:Title, EDITION =:Edition, AUTHOR_ID =:Author, GENRE_ID =:Genre, PUBLICATION_DATE =:Publication_Date, PUBLISHER =:Publisher, QUANTITY =:Quantity, IMAGE =:IMAGE";
                 type = true;
                 Console.WriteLine("Updating a record!");
             }
             else
             {
-                command = "INSERT INTO book_table VALUES(:Book_ID, :ISBN, :Title, :Edition, :Author, :Genre, :Publication_Date, :Publisher, :Quantity, :Price, :Thumbnail)";
+                command = "INSERT INTO book_table VALUES(:Book_ID, :ISBN, :Title, :Edition, :Author_ID, :Genre_ID, :Publication_Date, :Publisher, :Quantity, :IMAGE where book_ID = :book_ID)";
                 type = false;
                 Console.WriteLine("Inserting a record!");
             }
-            string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
-
             using (OracleConnection con = new OracleConnection(connection))
             {
                 OracleCommand cmd = new OracleCommand(command, con);
@@ -209,8 +373,8 @@ namespace Sage
                 cmd.Parameters.Add(new OracleParameter("ISBN", txtISBN.Text));
                 cmd.Parameters.Add(new OracleParameter("Title", txtTitle.Text));
                 cmd.Parameters.Add(new OracleParameter("Edition", Convert.ToInt32(txtEdition.Text)));
-                cmd.Parameters.Add(new OracleParameter("Author", txtAuthor.Text));
-                cmd.Parameters.Add(new OracleParameter("Genre", txtGenre.Text));
+                cmd.Parameters.Add(new OracleParameter("Author_ID", txtAuthor.Text));
+                cmd.Parameters.Add(new OracleParameter("Genre_ID", txtGenre.Text));
 
                 if (string.IsNullOrEmpty(txtPub_Date.Text))
                     cmd.Parameters.Add(new OracleParameter("Publication_Date", DBNull.Value));
@@ -226,11 +390,10 @@ namespace Sage
 
                 cmd.Parameters.Add(new OracleParameter("Publisher", txtPublisher.Text));
                 cmd.Parameters.Add(new OracleParameter("Quantity", Convert.ToInt32(txtQuantity.Text)));
-                cmd.Parameters.Add(new OracleParameter("Price", Convert.ToDouble(txtPrice.Text)));
                 if (string.IsNullOrEmpty(txtPub_Date.Text))
-                    cmd.Parameters.Add(new OracleParameter("Thumbnail", DBNull.Value));
+                    cmd.Parameters.Add(new OracleParameter("IMAGE", DBNull.Value));
                 else
-                    cmd.Parameters.Add(new OracleParameter("Thumbnail", txtThumb.Text));
+                    cmd.Parameters.Add(new OracleParameter("IMAGE", txtImage.Text));
                 con.Open();
                 try
                 {
@@ -248,62 +411,42 @@ namespace Sage
                 }
                 con.Close();
             }
-
         }
-
-        public void btnUpdate_Click(object sender, RoutedEventArgs e)
+        void Contact_INSERT(string connection, string table)
         {
-            string command = string.Empty;
             bool type = false;
-            if (CheckAvail(txtID.Text) == true){
-                command = "UPDATE book_table SET book_ID = :BOOK_ID, ISBN = :ISBN, TITLE =:Title, EDITION =:Edition, AUTHOR =:Author, GENRE =:Genre, PUBLICATION_DATE =:Publication_Date, PUBLISHER =:Publisher, QUANTITY =:Quantity, PRICE =:Price, THUMB =:Thumbnail";
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
+            {
+                command = "UPDATE contact_table SET contact_ID = :contact_ID, phone_number = :phone_number, zip_code = :zip_code, address =:address where contact_ID = :contact_ID";
                 type = true;
+                Console.WriteLine("Updating a record!");
             }
             else
             {
-                command = "INSERT INTO book_table VALUES(:Book_ID, :ISBN, :Title, :Edition, :Author, :Genre, :Publication_Date, :Publisher, :Quantity, :Price, :Thumbnail";
+                command = "INSERT INTO contact_table (contact_ID, phone_Number, zip_Code, Address) VALUES(:contact_ID, :phone_number, :zip_code, :address)";
                 type = false;
+                Console.WriteLine("Inserting a record!");
             }
-            string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
-            
             using (OracleConnection con = new OracleConnection(connection))
             {
                 OracleCommand cmd = new OracleCommand(command, con);
-                if (string.IsNullOrEmpty(txtID.Text))
-                    cmd.Parameters.Add(new OracleParameter(":Book_ID", DBNull.Value));
-                else
-                    cmd.Parameters.Add(new OracleParameter(":Book_ID", txtID.Text));
-                cmd.Parameters.Add(new OracleParameter(":ISBN", txtISBN.Text));
-                cmd.Parameters.Add(new OracleParameter(":Title", txtTitle.Text));
-                cmd.Parameters.Add(new OracleParameter(":Edition", Convert.ToInt32(txtEdition.Text)));
-                cmd.Parameters.Add(new OracleParameter(":Author", txtAuthor.Text));
-                cmd.Parameters.Add(new OracleParameter(":Genre", txtGenre.Text));
-
-                if (string.IsNullOrEmpty(txtPub_Date.Text))
-                    cmd.Parameters.Add(new OracleParameter(":Publication_Date", DBNull.Value));
-                else
+                for (int i = 0; i < 3; i++)
                 {
-                    DateTime CreatedDate = DateTime.ParseExact(txtPub_Date.Text, new String[] {
-                "MM/dd/yyyy hh:mm:ss tt", // your initial pattern, recommended way
-                "d-M-yyyy"},              // actual input, tolerated way
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    DateTimeStyles.AssumeLocal);
-                    cmd.Parameters.Add(new OracleParameter(":Publication_Date", CreatedDate));
+                    if (string.IsNullOrEmpty(Retrieve.GetBoxes()[i].Text))
+                        throw new ArgumentException("Parameter cannot be null", "Null detected!");
                 }
+                cmd.Parameters.Add(new OracleParameter("contact_ID", txtID.Text));
+                cmd.Parameters.Add(new OracleParameter("phone_number", txtISBN.Text));
+                cmd.Parameters.Add(new OracleParameter("zip_code", txtTitle.Text));
+                cmd.Parameters.Add(new OracleParameter("address", txtEdition.Text));
 
-                cmd.Parameters.Add(new OracleParameter(":Publisher", txtPublisher.Text));
-                cmd.Parameters.Add(new OracleParameter(":Quantity", Convert.ToInt32(txtQuantity.Text)));
-                cmd.Parameters.Add(new OracleParameter(":Price", Convert.ToDouble(txtPrice.Text)));
-                if (string.IsNullOrEmpty(txtPub_Date.Text))
-                    cmd.Parameters.Add(new OracleParameter(":Thumbnail", DBNull.Value));
-                else
-                    cmd.Parameters.Add(new OracleParameter(":Thumbnail", txtThumb.Text));
                 con.Open();
                 try
                 {
                     int rowsUpdated = cmd.ExecuteNonQuery();
-                    string text = type == true ? "updated" : "inserted" ;
-                    if (rowsUpdated >1)
+                    string text = type == true ? "updated" : "inserted";
+                    if (rowsUpdated > 1)
                         MessageBox.Show(rowsUpdated + " row(s) " + text);
                     else
                         MessageBox.Show(rowsUpdated + " row " + text);
@@ -315,105 +458,260 @@ namespace Sage
                 }
                 con.Close();
             }
-            
+        }
+        void Student_INSERT(string connection, string table)
+        {
+            bool type = false;
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
+            {
+                command = "UPDATE student_table SET student_ID = :student_ID, student_Name = :student_Name, contact_ID = :contact_ID where student_ID = :student_ID";
+                type = true;
+                Console.WriteLine("Updating a record!");
+            }
+            else
+            {
+                command = "INSERT INTO student_table (student_ID, student_Name, contact_ID) VALUES(:student_ID, :student_Name, :contact_ID)";
+                type = false;
+                Console.WriteLine("Inserting a record!");
+            }
+            using (OracleConnection con = new OracleConnection(connection))
+            {
+                OracleCommand cmd = new OracleCommand(command, con);
+                for(int i = 0; i<2; i++)
+                {
+                    if (string.IsNullOrEmpty(Retrieve.GetBoxes()[i].Text))
+                        throw new ArgumentException("Parameter cannot be null", "Null detected!");
+                }
+                cmd.Parameters.Add(new OracleParameter("student_ID", txtID.Text));
+                cmd.Parameters.Add(new OracleParameter("student_Name", txtISBN.Text));
+                cmd.Parameters.Add(new OracleParameter("contact_ID", txtTitle.Text));
+                
+                con.Open();
+                try
+                {
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    string text = type == true ? "updated" : "inserted";
+                    if (rowsUpdated > 1)
+                        MessageBox.Show(rowsUpdated + " row(s) " + text);
+                    else
+                        MessageBox.Show(rowsUpdated + " row " + text);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+                con.Close();
+            }
+        }
+        void Author_INSERT(string connection, string table)
+        {
+            bool type = false;
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
+            {
+                command = "UPDATE author_master SET author_ID = :author_ID, author_Name = :author_Name where author_ID = :author_ID";
+                type = true;
+                Console.WriteLine("Updating a record!");
+            }
+            else
+            {
+                command = "INSERT INTO author_master (author_ID, author_Name) VALUES(:author_ID, :author_Name)";
+                type = false;
+                Console.WriteLine("Inserting a record!");
+            }
+            using (OracleConnection con = new OracleConnection(connection))
+            {
+                OracleCommand cmd = new OracleCommand(command, con);
+                for (int i = 0; i < 1; i++)
+                {
+                    if (string.IsNullOrEmpty(Retrieve.GetBoxes()[i].Text))
+                        throw new ArgumentException("Parameter cannot be null", "Null detected!");
+                }
+                cmd.Parameters.Add(new OracleParameter("author_ID", txtID.Text));
+                cmd.Parameters.Add(new OracleParameter("author_Name", txtISBN.Text));
 
+                con.Open();
+                try
+                {
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    string text = type == true ? "updated" : "inserted";
+                    if (rowsUpdated > 1)
+                        MessageBox.Show(rowsUpdated + " row(s) " + text);
+                    else
+                        MessageBox.Show(rowsUpdated + " row " + text);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+                con.Close();
+            }
+        }
+        void Genre_INSERT(string connection, string table)
+        {
+            bool type = false;
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
+            {
+                command = "UPDATE genre_master SET genre_ID = :genre_ID, genre_Name = :genre_Name where genre_ID = :genre_ID";
+                type = true;
+                Console.WriteLine("Updating a record!");
+            }
+            else
+            {
+                command = "INSERT INTO genre_master (genre_ID, genre_Name) VALUES(:genre_ID, :genre_Name)";
+                type = false;
+                Console.WriteLine("Inserting a record!");
+            }
+            using (OracleConnection con = new OracleConnection(connection))
+            {
+                OracleCommand cmd = new OracleCommand(command, con);
+                for (int i = 0; i < 1; i++)
+                {
+                    if (string.IsNullOrEmpty(Retrieve.GetBoxes()[i].Text))
+                        throw new ArgumentException("Parameter cannot be null", "Null detected!");
+                }
+                cmd.Parameters.Add(new OracleParameter("genre_ID", txtID.Text));
+                cmd.Parameters.Add(new OracleParameter("genre_Name", txtISBN.Text));
+
+                con.Open();
+                try
+                {
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    string text = type == true ? "updated" : "inserted";
+                    if (rowsUpdated > 1)
+                        MessageBox.Show(rowsUpdated + " row(s) " + text);
+                    else
+                        MessageBox.Show(rowsUpdated + " row " + text);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+                con.Close();
+            }
+        }
+
+
+
+        public void btnUpdate_Click(object sender, RoutedEventArgs e)
+        {
+    
         }
         public void btnDelete_Click(object sender, RoutedEventArgs e)
         {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
             string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
             string command = string.Empty;
             using (OracleConnection con = new OracleConnection(connection))
             {
-                command = "Delete * FROM book_table where BOOK_ID =:id ";
+                con.Open();
+                string tables = Retrieve.SelectTable();
+                command = "Delete FROM "+ QueryBuilder(tables, "where", tables.Split('_')[0]+"_ID");
+                Console.WriteLine(command);
                 OracleCommand cmd = new OracleCommand(command, con);
-                cmd.Parameters.Add(new OracleParameter(":id", txtID.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtISBN.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtTitle.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtEdition.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtAuthor.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtPub_Date.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtPublisher.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtQuantity.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtPrice.Text));
-                cmd.Parameters.Add(new OracleParameter(":id", txtThumb.Text));
-                OracleDataAdapter oda = new OracleDataAdapter(cmd);
-                
-                DataTable dt = new DataTable("book_table");
-                oda.Fill(dt);
-                DGV.ItemsSource = dt.DefaultView;
+                cmd.Parameters.Add(new OracleParameter(":"+ tables.Split('_')[0] + "_ID", ListedBoxes[0].Text));
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
             }
         }
+        public void btnDeleteOrder_Click(object sender, RoutedEventArgs e)
+        {
+            List<TextBox> ListedBoxes = Retrieve.GetBoxes();
+            string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+            string command = string.Empty;
+            using (OracleConnection con = new OracleConnection(connection))
+            {
+                con.Open();
+                string tables = Retrieve.SelectTable();
+                command = "Delete FROM order_table where order_ID = :order_ID";
+                Console.WriteLine(command);
+                OracleCommand cmd = new OracleCommand(command, con);
+                cmd.Parameters.Add(new OracleParameter(":order_ID", ListedBoxes[0].Text));
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+            }
+        }
+        #endregion
+
+        #region  PASSIVE
         private void DataGridAutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
             if (e.PropertyName.StartsWith("BOOK_ID"))
                 e.Column.Header = "BOOK ID";
             if (e.PropertyName.StartsWith("ORDER_ID"))
                 e.Column.Header = "ORDER ID";
+            if (e.PropertyName.StartsWith("AUTHOR_ID"))
+                e.Column.Header = "AUTHOR ID";
+            if (e.PropertyName.StartsWith("GENRE_ID"))
+                e.Column.Header = "GENRE ID";
+            if (e.PropertyName.StartsWith("AUTO_NO"))
+                e.Column.Header = "AUTO";
             if (e.PropertyName.StartsWith("PRICE_AMT"))
                 e.Column.Header = "PRICE";
             if (e.PropertyName.StartsWith("PAID_AMt"))
                 e.Column.Header = "PAID";
-            if (e.PropertyName.StartsWith("THUMB"))
+            if (e.PropertyName.StartsWith("IMAGE"))
                 e.Column.Header = "IMAGE";
             if (e.PropertyName.StartsWith("PUBLICATION_DATE"))
                 e.Column.Header = "DATE";
+            if (e.PropertyName.StartsWith("STUDENT_ID"))
+                e.Column.Header = "STUDENT ID";
+            if (e.PropertyName.StartsWith("STUDENT_NAME"))
+                e.Column.Header = "STUDENT NAME";
+            if (e.PropertyName.StartsWith("CONTACT_ID"))
+                e.Column.Header = "CONTACT ID";
+            if (e.PropertyName.StartsWith("PHONE_NUMBER"))
+                e.Column.Header = "PHONE NUMBER";
+            if (e.PropertyName.StartsWith("ZIP_CODE"))
+                e.Column.Header = "ZIP CODE";
         }
-
-        public void OLE()
-        {
-            String sConnectionString = "User ID=SAGE;password=password;Data Source = localhost:1521/xe; Persist Security Info = False";
-            String mySelectQuery = "SELECT FName FROM sage_table";
-
-            OracleConnection myConnection = new OracleConnection(sConnectionString);
-            OracleCommand myCommand = new OracleCommand(mySelectQuery, myConnection);
-
-            myConnection.Open();
-            OracleDataReader myReader = myCommand.ExecuteReader();
-            int RecordCount = 0;
-            try
-            {
-                while (myReader.Read())
-                {
-                    RecordCount = RecordCount + 1;
-                    MessageBox.Show(myReader.GetString(0).ToString());
-                }
-                if (RecordCount == 0)
-                {
-                    MessageBox.Show("No data returned");
-                }
-                else
-                {
-                    MessageBox.Show("Number of records returned: " + RecordCount);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-            finally
-            {
-                myReader.Close();
-                myConnection.Close();
-            }
-        }
-
-
-
-        private void FillDataGrid()
+        private void FillDataGrid(string tables)
         {
             string ConString = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
             string CmdString = string.Empty;
             using (OracleConnection con = new OracleConnection(ConString))
             {
-                CmdString = "SELECT * FROM book_table";
+                CmdString = string.Format("SELECT * FROM {0}", tables);
+                Console.WriteLine("Using TABLE: " + tables);
                 OracleCommand cmd = new OracleCommand(CmdString, con);
-                OracleDataAdapter sda = new OracleDataAdapter(cmd);
-                DataTable dt = new DataTable("book_table");
-                sda.Fill(dt);
+                OracleDataAdapter oda = new OracleDataAdapter(cmd);
+                DataTable dt = new DataTable(tables);
+                try
+                {
+                    oda.Fill(dt);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+                DGV.ItemsSource = null;
                 DGV.ItemsSource = dt.DefaultView;
+                DGV.Items.Refresh();
             }
         }
+        #endregion
 
+        #region Throwaway
         public void Conn()
         {
             using (OracleConnection con = new OracleConnection(conString))
@@ -446,42 +744,19 @@ namespace Sage
                 }
             }
         }
-
-        public void ReadData(string connectionString)
-        {
-            string queryString = "SELECT ID, FName FROM sage_table";
-            using (OracleConnection connection = new OracleConnection(connectionString))
-            {
-                OracleCommand command = new OracleCommand(queryString, connection);
-                connection.Open();
-                Console.WriteLine("open");
-                try
-                {
-                    using (OracleDataReader reader = command.ExecuteReader())
-                    {
-                        // Always call Read before accessing data.
-                        while (reader.Read())
-                        {
-                            Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
-                            Console.WriteLine("done");
-                        }
-                    }
-                }
-                catch (OracleException ex)
-                {
-                    Console.WriteLine("Exception Message: " + ex.Message);
-                    Console.WriteLine("Exception Source: " + ex.Source);
-                }
-            }
-        }
         public class OracleDBManager
         {
-            private OracleConnection _con;
+            //private OracleConnection _con;
             private const string connectionString = "User Id={0};Password={1};Data Source=MyDataSource;";
             private const string OracleDBUser = "sage";
             private const string OracleDBPassword = "password";
 
         }
+        private void DGV_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+        #endregion
 
         private void btnUpload_Click(object sender, RoutedEventArgs e)
         {
@@ -500,8 +775,87 @@ namespace Sage
             {
                 // Open document 
                 string filename = dlg.FileName;
-                txtThumb.Text = filename;
+                txtImage.Text = filename;
             }
         }
+
+
+
+        private void btnGo_Click(object sender, RoutedEventArgs e)
+        {
+            FillDataGrid(Retrieve.SelectTable());
+        }
+
+        private void btnInsertOrder_Click(object sender, RoutedEventArgs e)
+        {
+            string table = "order_table";
+            string connection = ConfigurationManager.ConnectionStrings["conString"].ConnectionString;
+            bool type = false;
+            string command = string.Empty;
+            if (CheckAvail(txtID.Text, table) == true)
+            {
+                command = "UPDATE order_table SET book_id = :book_id, student_id = :student_id, borrowed =:borrowed, returned =:returned, balance =:balance where order_ID = :order_ID";
+                type = true;
+                Console.WriteLine("Updating a record!");
+            }
+            else
+            {
+                command = "INSERT INTO order_table (book_id, student_id, borrowed, returned, balance) VALUES(:book_id, :student_id, :borrowed, :returned, :balance)";
+                type = false;
+                Console.WriteLine("Inserting a record!");
+            }
+            using (OracleConnection con = new OracleConnection(connection))
+            {
+                OracleCommand cmd = new OracleCommand(command, con);
+                for (int i = 0; i < 2; i++)
+                {
+                    if (string.IsNullOrEmpty(Retrieve.GetBoxes()[i].Text))
+                        throw new ArgumentException("Parameter cannot be null", "Null detected!");
+                }
+                cmd.Parameters.Add(new OracleParameter("book_id", txtID.Text));
+                cmd.Parameters.Add(new OracleParameter("student_id", txtISBN.Text));
+                if (string.IsNullOrEmpty(txtTitle.Text))
+                    cmd.Parameters.Add(new OracleParameter("borrowed", DBNull.Value));
+                else
+                {
+                    DateTime CreatedDate = DateTime.ParseExact(txtTitle.Text, new String[] {
+                "MM/dd/yyyy hh:mm:ss tt", // your initial pattern, recommended way
+                "d-M-yyyy"},              // actual input, tolerated way
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeLocal);
+                    cmd.Parameters.Add(new OracleParameter("borrowed", CreatedDate));
+                }
+                if (string.IsNullOrEmpty(txtEdition.Text))
+                    cmd.Parameters.Add(new OracleParameter("returned", DBNull.Value));
+                else
+                {
+                    DateTime CreatedDate = DateTime.ParseExact(txtEdition.Text, new String[] {
+                "MM/dd/yyyy hh:mm:ss tt", // your initial pattern, recommended way
+                "d-M-yyyy"},              // actual input, tolerated way
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeLocal);
+                    cmd.Parameters.Add(new OracleParameter("returned", CreatedDate));
+                }
+                cmd.Parameters.Add(new OracleParameter("balance", Convert.ToDouble(txtAuthor.Text)));
+
+                con.Open();
+                try
+                {
+                    int rowsUpdated = cmd.ExecuteNonQuery();
+                    string text = type == true ? "updated" : "inserted";
+                    if (rowsUpdated > 1)
+                        MessageBox.Show(rowsUpdated + " row(s) " + text);
+                    else
+                        MessageBox.Show(rowsUpdated + " row " + text);
+                }
+                catch (OracleException ex)
+                {
+                    Console.WriteLine("Exception Message: " + ex.Message);
+                    Console.WriteLine("Exception Source: " + ex.Source);
+                }
+                con.Close();
+            }
+        }
+
     }
 }

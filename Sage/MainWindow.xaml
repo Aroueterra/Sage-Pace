@@ -40,7 +40,7 @@
             <TabControl>
                 <TabItem Header="Inventory" x:Name="tbInventory" MouseLeftButtonUp="tbInventory_Click">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Margin="0,0,0,-45" >
-                        <Button Grid.Row="1" Grid.Column="1" Height="55" Width="55"   x:Name="Insert"   Click="btnInsert_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Button Grid.Row="1" Grid.Column="1" Height="55" Width="55"   x:Name="Insert"   Click="btnInsertOrder_Click" Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
                                 <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/insert2.png">
                                     <Image.Style>
@@ -53,10 +53,9 @@
                                         </Style>
                                     </Image.Style>
                                 </Image>
-                                
                             </Button.Content>
                         </Button>
-                        <Button Grid.Row="2" Grid.Column="1" Height="55" Width="55"   x:Name="Update"   Click="btnDelete_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                        <!--<Button Grid.Row="2" Grid.Column="1" Height="55" Width="55"   x:Name="Update"   Click="btnDelete_Click" Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
 
                                 <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/update.png">
@@ -70,12 +69,10 @@
                                         </Style>
                                     </Image.Style>
                                 </Image>
-
                             </Button.Content>
-                        </Button>
+                        </Button>-->
                         <Button Grid.Row="3" Grid.Column="1" Height="55" Width="55"   x:Name="Delete"   Click="btnDelete_Click" Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
-
                                 <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/delete.png">
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -92,7 +89,6 @@
                         </Button>
                         <Button Grid.Row="4" Grid.Column="1" Height="55" Width="55"   x:Name="Upload"   Click="btnUpload_Click" Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
-
                                 <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/upload.png">
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -107,8 +103,10 @@
 
                             </Button.Content>
                         </Button>
-                        
-                        
+
+
+
+
                         <!--<TextBox Grid.Row="0" Width="150" Controls:TextBoxHelper.Watermark="Username" Visibility="Hidden" />
                         <PasswordBox Grid.Row="1" Width="150" Controls:TextBoxHelper.Watermark="Password" PasswordChar="*" Visibility="Hidden" />
                         <Button Grid.Row="0" Width="250" Height="45" Grid.Column="0" x:Name="Select"  VerticalAlignment="Center" Click="Connect_Click" Style="{StaticResource AccentedSquareButtonStyle}" Visibility="Hidden">
@@ -117,21 +115,23 @@
                                     <Label 
                                         MouseLeftButtonDown="tbInventory_Click" 
                                         HorizontalAlignment="Stretch"/>
-                                    --><!--<iconPacks:PackIconFontAwesome Kind="StarRegular" VerticalAlignment="Center" HorizontalAlignment="Left" />--><!--
+                                    -->
+                        <!--<iconPacks:PackIconFontAwesome Kind="StarRegular" VerticalAlignment="Center" HorizontalAlignment="Left" />-->
+                        <!--
                                     <TextBlock FontSize="16" HorizontalAlignment="Left"> CONNECT</TextBlock>
                                 </StackPanel>
-                                --><!--Margin="95 0 0 0"--><!--
+                                -->
+                        <!--Margin="95 0 0 0"-->
+                        <!--
                             </Button.Content>
                         </Button>-->
-                        
+
                     </StackPanel>
                 </TabItem>
-                
                 <TabItem Header="Orders" MouseLeftButtonUp="tbOrders_Click">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Margin="0,0,0,-45" >
-                        <Button Grid.Row="4" Grid.Column="1" Height="55" Width="55"   x:Name="Receipt"   Click="Submit_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Button Grid.Row="4" Grid.Column="1" Height="55" Width="55"   x:Name="Receipt"   Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
-
                                 <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/receipt.png">
                                     <Image.Style>
                                         <Style TargetType="Image">
@@ -143,14 +143,43 @@
                                         </Style>
                                     </Image.Style>
                                 </Image>
-
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Row="1" Grid.Column="1" Height="55" Width="55"   x:Name="Insert_Order"   Click="btnInsertOrder_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                            <Button.Content>
+                                <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/insert2.png">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.3" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Row="4" Grid.Column="1" Height="55" Width="55"   x:Name="Delete_Order"   Click="btnDeleteOrder_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                            <Button.Content>
+                                <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/delete.png">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.3" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
                             </Button.Content>
                         </Button>
                     </StackPanel>
                 </TabItem>
                 <TabItem Header="Export" MouseLeftButtonUp="tbExport_Click">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Margin="0,0,0,-45" >
-                        <Button Grid.Row="5" Grid.Column="1" Height="55" Width="55"   x:Name="Export"   Click="Submit_Click" Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Button Grid.Row="5" Grid.Column="1" Height="55" Width="55"   x:Name="Export"    Style="{DynamicResource MetroCircleButtonStyle}">
                             <Button.Content>
 
                                 <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/excel.png">
@@ -181,16 +210,16 @@
                 <RowDefinition Height="45" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel>
+            <StackPanel Margin="0,0,10,0">
 
             </StackPanel>
             <DataGrid HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Column="0" x:Name="DGV" ItemsSource="{Binding}" 
                       AutoGenerateColumns="True" AutoGeneratingColumn="DataGridAutoGeneratingColumn"
-                      SelectionMode="Single" SelectionUnit="FullRow"
+                      SelectionMode="Single" SelectionUnit="FullRow"  SelectionChanged="DGV_SelectionChanged" IsReadOnly="True"
                       >
             </DataGrid>
             <Rectangle Grid.Row="1" Margin="-15,0,0,-14">
@@ -229,105 +258,37 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0"/>
-                        <ColumnDefinition Width="0"/>
-                        <ColumnDefinition Width="185*"/> 
+                        <ColumnDefinition Width="140*"/>
+                        <ColumnDefinition Width="145*"/> 
                     </Grid.ColumnDefinitions>
-                    <!--<TextBlock Grid.Row="0" Grid.Column="1" FontSize="16" Foreground="#FF259CE0"  HorizontalAlignment="Center">
-                        ACTIONS </TextBlock> was169*-->
-                    <!--<Button Grid.Row="1" Grid.Column="1" Height="45" Width="45"   x:Name="Insert"   Click="btnInsert_Click" Style="{DynamicResource MetroCircleButtonStyle}">
-                        <Button.Content>
-                            <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/insert2.png">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.3" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-                        </Button.Content>
-                    </Button>
-                    <Button Grid.Row="2" Grid.Column="1" Height="45" Width="45"   x:Name="Update"   Click="btnDelete_Click" Style="{DynamicResource MetroCircleButtonStyle}">
-                        <Button.Content>
-
-                            <Image Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/update.png">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.3" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-
-                        </Button.Content>
-                    </Button>
-                    <Button Grid.Row="3" Grid.Column="1" Height="45" Width="45"   x:Name="Delete"   Click="btnDelete_Click" Style="{DynamicResource MetroCircleButtonStyle}">
-                        <Button.Content>
-
-                            <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/delete.png">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.3" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-
-                        </Button.Content>
-                    </Button>
-                    <Button Grid.Row="4" Grid.Column="1" Height="45" Width="45"   x:Name="Receipt"   Click="Submit_Click" Style="{DynamicResource MetroCircleButtonStyle}">
-                        <Button.Content>
-
-                            <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/receipt.png">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.3" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-
-                        </Button.Content>
-                    </Button>
-                    <Button Grid.Row="5" Grid.Column="1" Height="45" Width="45"   x:Name="Export"   Click="Submit_Click" Style="{DynamicResource MetroCircleButtonStyle}">
-                        <Button.Content>
-
-                            <Image Height="20" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/excel.png">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsEnabled" Value="False">
-                                                <Setter Property="Opacity" Value="0.3" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-
-                        </Button.Content>
-                    </Button>-->
-                    <TextBox Grid.Row="0" Width="220" Controls:TextBoxHelper.Watermark="Book ID" IsReadOnly="False" x:Name="txtID" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="1" Width="220" Controls:TextBoxHelper.Watermark="ISBN" x:Name="txtISBN" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="2" Width="220" Controls:TextBoxHelper.Watermark="Title" x:Name="txtTitle" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="3" Width="220" Controls:TextBoxHelper.Watermark="Edition" x:Name="txtEdition" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="4" Width="220" Controls:TextBoxHelper.Watermark="Author" x:Name="txtAuthor" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="5" Width="220" Controls:TextBoxHelper.Watermark="Genre" x:Name="txtGenre" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="6" Width="220" Controls:TextBoxHelper.Watermark="Publication Date" x:Name="txtPub_Date" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="7" Width="220" Controls:TextBoxHelper.Watermark="Publisher" x:Name="txtPublisher" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="8" Width="220" Controls:TextBoxHelper.Watermark="Quantity" x:Name="txtQuantity" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="9" Width="220" Controls:TextBoxHelper.Watermark="Price" x:Name="txtPrice" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                    <TextBox Grid.Row="10" Width="220" Controls:TextBoxHelper.Watermark="Thumbnail" x:Name="txtThumb" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+                    <TextBlock x:Name="lblSelect" Grid.Row="0" Grid.Column="1" TextAlignment="Center" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        Selected Table
+                    </TextBlock>
+                    <StackPanel x:Name="cmbStack" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                        <ComboBox  x:Name="cmbTables" SelectedValuePath="Content" Text="Book_Table" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsEditable="True" IsReadOnly="True" SelectionChanged="cmbSearch_SelectionChanged" DropDownClosed="ComboBox_DropDownClosed">
+                        <ComboBoxItem Content="book_table"/>
+                        <ComboBoxItem Content="author_master"/>
+                        <ComboBoxItem Content="genre_master"/>
+                        <ComboBoxItem Content="contact_table"/>
+                        <ComboBoxItem Content="student_table"/>
+                        </ComboBox>
+                    
+                        <Button Grid.Row="1" Grid.Column="1" Width="40"  HorizontalAlignment="Right" FontSize="10" Click="btnGo_Click">
+                            Load
+                        </Button>
+                    </StackPanel>
+                    <TextBox Grid.Row="0" Width="150" Controls:TextBoxHelper.Watermark="Search" IsReadOnly="False" x:Name="txtSearch" Grid.Column="2" Background="Azure" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="1" Width="150" Controls:TextBoxHelper.Watermark="Book ID" IsReadOnly="False" x:Name="txtID" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="2" Width="150" Controls:TextBoxHelper.Watermark="ISBN" x:Name="txtISBN" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="3" Width="150" Controls:TextBoxHelper.Watermark="Title" x:Name="txtTitle" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="4" Width="150" Controls:TextBoxHelper.Watermark="Edition" x:Name="txtEdition" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="5" Width="150" Controls:TextBoxHelper.Watermark="Author" x:Name="txtAuthor" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="6" Width="150" Controls:TextBoxHelper.Watermark="Genre" x:Name="txtGenre" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="7" Width="150" Controls:TextBoxHelper.Watermark="Publication Date" x:Name="txtPub_Date" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="8" Width="150" Controls:TextBoxHelper.Watermark="Publisher" x:Name="txtPublisher" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="9" Width="150" Controls:TextBoxHelper.Watermark="Quantity" x:Name="txtQuantity" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    <TextBox Grid.Row="10" Width="150" Controls:TextBoxHelper.Watermark="Image" x:Name="txtImage" Grid.Column="2" Margin="1.5,0,17,0" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                    
                 </Grid>
             </StackPanel>
 
