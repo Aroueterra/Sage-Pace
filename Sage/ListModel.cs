@@ -9,7 +9,21 @@ namespace Sage
 {
     public class ListModel
     {
+        private string IO_NAME;
         private List<TextBox> ListedBox;
+        private List<String> Author_Master = new List<string>
+            (new string[] { "Author_ID", "Author_Name"});
+        private List<String> Genre_Master = new List<string>
+            (new string[] { "Genre_ID", "Genre_Name" });
+        private List<String> Contact_Table = new List<string>
+            (new string[] { "Contact_ID", "Phone_Number", "Zip_Code", "Address" });
+        private List<String> Student_Table = new List<string>
+            (new string[] { "Student_ID", "Student_Name", "Contact_ID" });
+        private List<String> Book_Table = new List<string>
+            (new string[] { "Book_ID", "ISBN", "Title", "Edition", "Author_ID", "Genre_ID", "Publication_Date", "Publisher", "Quantity", "Image" });
+        private List<String> Order_Table = new List<string>
+            (new string[] { "Order_ID", "Book_ID", "Student_ID", "Borrowed", "Returned" });
+
         private string SelectedTable;
         public List<TextBox> Lister(TextBox[] boxes)
         {
@@ -26,6 +40,14 @@ namespace Sage
         {
             ListedBox = texts;
         }
+        public void SetIO(string texts)
+        {
+            IO_NAME = texts;
+        }
+        public string GetIO()
+        {
+            return IO_NAME;
+        }
         public List<TextBox> GetBoxes()
         {
             return ListedBox;
@@ -38,6 +60,27 @@ namespace Sage
                 "Publication Date", "Publisher", "Quantity", "Image"
             };
             return Content;
+        }
+        public List<string> ColumnNames(string str)
+        {
+            switch (str)
+            {
+                case "author_master":
+                    return Author_Master;
+                case "genre_master":
+                    return Genre_Master;
+                case "contact_table":
+                    return Contact_Table;
+                case "book_table":
+                    return Book_Table;
+                case "student_table":
+                    return Student_Table;
+                case "order_table":
+                    return Order_Table;
+                default:
+                    return Book_Table;
+            }
+            
         }
         public void SetTable(string table)
         {
