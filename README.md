@@ -20,7 +20,7 @@ Sage is a theoretical design implementation to resolve the needs of an existing 
 
 
 ```sh
-The program was designed with the specifications and requirements evaluated by the Tax Compliance department of Convergys Philippines Inc., as such it may not be as flexible as I'd intended. Future revisions will rectify this.
+The program was designed with the goal of utilizing Oracle SQL knowledge attained from the CCS014 ITEDBASE-01 class of 2018
 ```
 
 ## Installation
