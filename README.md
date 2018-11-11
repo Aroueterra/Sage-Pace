@@ -8,11 +8,12 @@
 
 <img align="right" width="100" height="100" src="https://avatars1.githubusercontent.com/u/20365551?s=400&u=e500e44c444dc1edd386184520cef4cbb79c448c&v=4">
 
-> [C#/.Net] My first attempt at using WPF to control the front-end within the .NET framework. 
+> TODO: Convert Framework model from event based programming to: MVVM (Model-View-ViewModel)
 
-TODO: Convert Framework model from event based programming to: MVVM (Model-View-ViewModel)
 
-Sage is a theoretical design implementation to resolve the needs of an existing physical system as they adapt into paper-less data record keeping.
+ 
+
+Sage is a theoretical design implementation to resolve the needs of an existing physical system as they adapt into paper-less data record keeping. Also, My first attempt at using WPF to control the front-end within the .NET framework. Using XAML for the interface was a different experience yet very similar to embedded css in html markup. Once I get the hang of data binding with a View Model, things will be stranger yet!
 
 ---
 
