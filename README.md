@@ -23,8 +23,6 @@ Sage is a theoretical design implementation to resolve the needs of an existing 
 The program was designed with the specifications and requirements evaluated by the Tax Compliance department of Convergys Philippines Inc., as such it may not be as flexible as I'd intended. Future revisions will rectify this.
 ```
 
-[![Splash screen](https://github.com/Aroueterra/RPG_Framework/blob/master/graphics/select.PNG)]()
-
 ## Installation
 
 Windows:
@@ -43,7 +41,7 @@ Run Sage.exe
 
 ## Logical Design
 
-[![Ldesign](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Logical.PNG)]()
+[![Ldesign](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Logical.png)]()
 
 You will notice that Author Master and Genre Master were broken down from their place in the Book Table, this is to allow any book to possess more than a single author, or more than a single genre. One tag may exist as multiple entries in the other table, thus, not their ID but an auto incremental dummy column was devised to allow insertion of records without constraints.
 This was modeled after the data of the client; thus, the scope may be small or unexpected. Until their model changes, the data dictionary will adapt to its needs.
@@ -67,15 +65,15 @@ _For more examples and usage, please refer to the [Wiki][wiki]._
 
 ## Keeping track of inventory
 
-[![Inventory screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Inventory.PNG)]()
+[![Inventory screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Inventory.png)]()
 
 ## Manage quantity reductions and overdue balances
 
-[![Orders screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Orders.PNG)]()
+[![Orders screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/Orders.png)]()
 
 ## CRUD Manipulation
 
-[![select screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/select.PNG)]()
+[![select screen](https://github.com/Aroueterra/Sage-Pace/blob/master/graphics/select.png)]()
 
 
 ```sh
